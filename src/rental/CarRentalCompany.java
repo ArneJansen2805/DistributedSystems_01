@@ -1,5 +1,7 @@
 package rental;
 
+import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -11,7 +13,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class CarRentalCompany {
+public class CarRentalCompany implements ICarRentalCompany {
 
 	private static Logger logger = Logger.getLogger(CarRentalCompany.class.getName());
 	
@@ -177,6 +179,31 @@ public class CarRentalCompany {
 			}
 		}
 		return out.toString();
+	}
+
+	@Override
+	public List<Reservation> getReservationsByRenter(String clientName) throws RemoteException {
+		List<Reservation> res = new ArrayList<>();
+		for (Car c : cars) {
+			for (Reservation r : c.getReservations()) {
+				if (r.getCarRenter().equals(clientName)) {
+					res.add(r);
+				}
+			}
+		}
+		return res;
+	}
+
+	@Override
+	public int getNumberOfReservationsForCarType(String carType) throws RemoteException {
+		int count = 0;
+		for (Car c : cars) {
+			if (c.getType().getName().equals(carType)) {
+				Collection<?> coll =  c.getReservations();
+				count += coll.size();
+			}
+		}
+		return count;
 	}
 	
 }

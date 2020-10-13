@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.invoke.MethodHandles;
+import java.rmi.Naming;
+import java.rmi.registry.*;
+import java.rmi.server.*;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,9 +23,16 @@ public class RentalServer {
 		// The first argument passed to the `main` method (if present)
 		// indicates whether the application is run on the remote setup or not.
 		int localOrRemote = (args.length == 1 && args[0].equals("REMOTE")) ? REMOTE : LOCAL;
-
-		CrcData data  = loadData("hertz.csv");
-		new CarRentalCompany(data.name, data.regions, data.cars);
+		
+		if (localOrRemote == 0) {
+			System.setSecurityManager(null);
+			CrcData data  = loadData("hertz.csv");
+			ICarRentalCompany crc =  new CarRentalCompany(data.name, data.regions, data.cars);
+			ICarRentalCompany stub = (ICarRentalCompany)
+					UnicastRemoteObject.exportObject(crc, 0);
+			Naming.rebind("//localhost:1099/cars",stub);
+		}
+		
 		
 	}
 
