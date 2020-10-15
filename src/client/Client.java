@@ -3,9 +3,12 @@ package client;
 import java.rmi.*;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import rental.Car;
+import rental.CarType;
 import rental.ICarRentalCompany;
 import rental.Quote;
 import rental.Reservation;
@@ -67,7 +70,12 @@ public class Client extends AbstractTestBooking {
 	 */
 	@Override
 	protected void checkForAvailableCarTypes(Date start, Date end) throws Exception {
-		crc.getAvailableCarTypes(start, end);
+		Collection<CarType> cars = crc.getAvailableCarTypes(start, end);
+		
+		System.out.println("These cars are currently available: ");
+		for(CarType c : cars) {
+			System.out.println(c);
+		}
 	}
 
 	/**
@@ -87,7 +95,9 @@ public class Client extends AbstractTestBooking {
 			throws Exception {
 		ReservationConstraints rsc = new ReservationConstraints(start, end, carType, region);
 		Quote quote = crc.createQuote(rsc, clientName);
+		System.out.println("---- TENTATIVE RESERVATION ----");
 		System.out.println(quote);
+		System.out.println("---- TENTATIVE RESERVATION ----");
 		return quote;
 	}
 
@@ -102,7 +112,9 @@ public class Client extends AbstractTestBooking {
 	@Override
 	protected Reservation confirmQuote(Quote quote) throws Exception {
 		Reservation res =  crc.confirmQuote(quote);
+		System.out.println("---- FINAL RESERVATION ----");
 		System.out.println(res);
+		System.out.println("---- FINAL RESERVATION ----");
 		return res;
 	}
 
@@ -118,13 +130,15 @@ public class Client extends AbstractTestBooking {
 	protected List<Reservation> getReservationsByRenter(String clientName) throws Exception {
 		List<Reservation> reservations = crc.getReservationsByRenter(clientName);
 		
+		System.out.println("---- RESERVATIONS FOR: " + clientName + " ----");
 		for(Reservation r : reservations) {
-			System.out.println(r.getCarType());
-			System.out.println(r.getCarId());
-			System.out.println(r.getStartDate() + " until " + r.getEndDate());
-			System.out.println(r.getRentalPrice());
+			System.out.println(r);
+			//System.out.println(r.getCarType());
+			//System.out.println(r.getCarId());
+			//System.out.println(r.getStartDate() + " until " + r.getEndDate());
+			//System.out.println(r.getRentalPrice());
 		}
-		
+		System.out.println("---- RESERVATIONS FOR: " + clientName + " ----");
 		return reservations;
 	}
 
@@ -139,7 +153,7 @@ public class Client extends AbstractTestBooking {
 	@Override
 	protected int getNumberOfReservationsForCarType(String carType) throws Exception {
 		int stats = crc.getNumberOfReservationsForCarType(carType);
-		System.out.println("Amount of reservations for: " + carType + " equals "  + stats);
+		//System.out.println("Amount of reservations for " + carType + ": "  + stats);
 		return stats;
 	}
 }
