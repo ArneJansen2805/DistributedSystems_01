@@ -23,14 +23,18 @@ public class RentalServer {
 		// The first argument passed to the `main` method (if present)
 		// indicates whether the application is run on the remote setup or not.
 		int localOrRemote = (args.length == 1 && args[0].equals("REMOTE")) ? REMOTE : LOCAL;
+		//System.setProperty("java.rmi.server.hostname","localhost");
 		
 		if (localOrRemote == 0) {
 			System.setSecurityManager(null);
 			CrcData data  = loadData("hertz.csv");
-			ICarRentalCompany crc =  new CarRentalCompany(data.name, data.regions, data.cars);
+			CarRentalCompany crc =  new CarRentalCompany(data.name, data.regions, data.cars);
 			ICarRentalCompany stub = (ICarRentalCompany)
 					UnicastRemoteObject.exportObject(crc, 0);
-			Naming.rebind("//localhost:1099/cars",stub);
+			//Naming.rebind("//localhost:1099/" + "cars",stub);
+					
+			Registry reg = LocateRegistry.createRegistry(1099);
+			reg.rebind("cars", stub);
 		}
 		
 		

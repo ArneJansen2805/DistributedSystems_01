@@ -29,7 +29,7 @@ public class Client extends AbstractTestBooking {
 		// The first argument passed to the `main` method (if present)
 		// indicates whether the application is run on the remote setup or not.
 		int localOrRemote = (args.length == 1 && args[0].equals("REMOTE")) ? REMOTE : LOCAL;
-
+		System.setSecurityManager(null);
 		String carRentalCompanyName = "Hertz";
 
 		// An example reservation scenario on car rental company 'Hertz' would be...
@@ -47,7 +47,7 @@ public class Client extends AbstractTestBooking {
 		Registry registry;
 		
 		try {
-			registry = LocateRegistry.getRegistry("localhost", 1099);
+			registry = LocateRegistry.getRegistry();
 			 crc = (ICarRentalCompany) registry.lookup("cars");
 		} catch (RemoteException e) {
 			
