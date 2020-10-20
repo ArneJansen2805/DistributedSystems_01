@@ -199,7 +199,8 @@ public class CarRentalCompany implements ICarRentalCompany {
 		int count = 0;
 		for (Car c : cars) {
 			if (c.getType().getName().equals(carType)) {
-				count += c.getReservations().size();
+				Collection<?> coll =  c.getReservations();
+				count += coll.size();
 			}
 		}
 		return count;
