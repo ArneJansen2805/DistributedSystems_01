@@ -6,15 +6,17 @@ import java.rmi.registry.Registry;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
-import rental.Car;
+import rental.AgencyManagerSession;
+import rental.AgencyReservationSession;
 import rental.CarType;
 import rental.ICarRentalCompany;
 import rental.Quote;
 import rental.Reservation;
 import rental.ReservationConstraints;
 
-public class Client extends AbstractTestBooking {
+public class Client extends AbstractTestManagement<AgencyReservationSession, AgencyManagerSession> {
 
 	/********
 	 * MAIN *
@@ -59,6 +61,73 @@ public class Client extends AbstractTestBooking {
 	
 		
 	}
+	
+	@Override
+	protected Set<String> getBestClients(AgencyManagerSession ms) throws Exception {
+		return ms.getBestClients();
+	}
+
+	@Override
+	protected String getCheapestCarType(AgencyReservationSession session, Date start, Date end, String region)
+			throws Exception {
+		return session.getCheapestCarTypes(start, end);
+	}
+
+	@Override
+	protected CarType getMostPopularCarTypeInCRC(AgencyManagerSession ms, String carRentalCompanyName, int year)
+			throws Exception {
+		return ms.getMostPopularCarType(carRentalCompanyName, year);
+	}
+
+	@Override
+	protected AgencyReservationSession getNewReservationSession(String name) throws Exception {
+		// TODO Fix potential issues with the addition of the new constructor 
+		return new AgencyReservationSession(name, crc);
+	}
+
+	@Override
+	protected AgencyManagerSession getNewManagerSession(String name) throws Exception {
+		return new AgencyManagerSession(name);
+	}
+
+	@Override
+	protected void checkForAvailableCarTypes(AgencyReservationSession session, Date start, Date end) throws Exception {
+		Collection<CarType> availableCarTypes = session.getAvailableCarTypes(start, end);
+		System.out.println("Cars Available at: " + session.getCompanyName());
+		
+		for (CarType type: availableCarTypes) {			
+			System.out.println(" - " + type.getName());
+		}
+	}
+
+	@Override
+	protected void addQuoteToSession(AgencyReservationSession session, String name, Date start, Date end,
+			String carType, String region) throws Exception {
+		session.addQuote(name, start, end, carType, region);
+		
+	}
+
+	@Override
+	protected List<Reservation> confirmQuotes(AgencyReservationSession session, String name) throws Exception {
+		return session.confirmQuotes(name);
+	}
+
+	@Override
+	protected int getNumberOfReservationsByRenter(AgencyManagerSession ms, String clientName) throws Exception {
+		return ms.getNumberOfReservationsByRenter(clientName);
+	}
+
+	@Override
+	protected int getNumberOfReservationsForCarType(AgencyManagerSession ms, String carRentalName, String carType)
+			throws Exception {
+		return ms.getNumberOfCompanyReservationsPerCarType(carRentalName, carType);
+	}
+	
+	
+	
+	/***************
+	 * OLD VERSION METHODS
+	 ***************/
 
 	/**
 	 * Check which car types are available in the given period (across all companies
@@ -68,7 +137,6 @@ public class Client extends AbstractTestBooking {
 	 * @param end   end time of the period
 	 * @throws Exception if things go wrong, throw exception
 	 */
-	@Override
 	protected void checkForAvailableCarTypes(Date start, Date end) throws Exception {
 		Collection<CarType> cars = crc.getAvailableCarTypes(start, end);
 		
@@ -90,7 +158,6 @@ public class Client extends AbstractTestBooking {
 	 * 
 	 * @throws Exception if things go wrong, throw exception
 	 */
-	@Override
 	protected Quote createQuote(String clientName, Date start, Date end, String carType, String region)
 			throws Exception {
 		ReservationConstraints rsc = new ReservationConstraints(start, end, carType, region);
@@ -109,7 +176,6 @@ public class Client extends AbstractTestBooking {
 	 * 
 	 * @throws Exception if things go wrong, throw exception
 	 */
-	@Override
 	protected Reservation confirmQuote(Quote quote) throws Exception {
 		Reservation res =  crc.confirmQuote(quote);
 		System.out.println("---- FINAL RESERVATION ----");
@@ -126,7 +192,6 @@ public class Client extends AbstractTestBooking {
 	 * 
 	 * @throws Exception if things go wrong, throw exception
 	 */
-	@Override
 	protected List<Reservation> getReservationsByRenter(String clientName) throws Exception {
 		List<Reservation> reservations = crc.getReservationsByRenter(clientName);
 		
@@ -150,10 +215,10 @@ public class Client extends AbstractTestBooking {
 	 * 
 	 * @throws Exception if things go wrong, throw exception
 	 */
-	@Override
 	protected int getNumberOfReservationsForCarType(String carType) throws Exception {
 		int stats = crc.getNumberOfReservationsForCarType(carType);
 		//System.out.println("Amount of reservations for " + carType + ": "  + stats);
 		return stats;
 	}
+
 }

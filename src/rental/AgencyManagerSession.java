@@ -1,19 +1,20 @@
-package client;
+package rental;
 
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-
-import rental.CarRentalCompany;
-import rental.CarType;
+import java.util.Set;
 
 public class AgencyManagerSession {
+	String agencyManagerName = "";
 	Map<String, CarRentalCompany> carRentalCompanies;
 
-	public AgencyManagerSession() {
+	public AgencyManagerSession(String name) {
+		agencyManagerName = name;
 		carRentalCompanies = new HashMap<String, CarRentalCompany>();
 	}
 
@@ -43,8 +44,20 @@ public class AgencyManagerSession {
 					+ " and car type: " + carType + "\nException message: " + e.getMessage());
 		}
 	}
+	
+	public int getNumberOfReservationsByRenter(String clientName) {
+		int numberOfReservations = 0;
+		for (CarRentalCompany crc : carRentalCompanies.values()) {
+			try {
+				numberOfReservations += crc.getReservationsByRenter(clientName).size();
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			}
+		}
+		return numberOfReservations;
+	} 
 
-	public List<String> getBestCustomers() {
+	public Set<String> getBestClients() {
 		List<String> bestCustomers = new ArrayList<String>();
 		
 		for (CarRentalCompany company : carRentalCompanies.values()) {
@@ -53,12 +66,12 @@ public class AgencyManagerSession {
 		}
 		
 		// To ensure only unique best customers are returned
-		return new ArrayList<String>(new HashSet<String>(bestCustomers));
+		return new HashSet<String>(bestCustomers);
 
 	}
 	
 	
-	public CarType getMostPopularCarType(String companyName, String carType, int year) {
+	public CarType getMostPopularCarType(String companyName, int year) {
 		CarRentalCompany company = getCarRentalCompany(companyName);
 		return company.getMostPopularCarTypePerYear(year);
 	}
@@ -69,7 +82,6 @@ public class AgencyManagerSession {
 			throw new IllegalArgumentException("No registered company named: " + companyName + "found.");
 
 		CarRentalCompany company = carRentalCompanies.get(companyName);
-
 		return company;
 	}
 }
