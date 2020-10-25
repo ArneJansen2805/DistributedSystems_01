@@ -25,7 +25,7 @@ public class RentalServer {
 		int localOrRemote = (args.length == 1 && args[0].equals("REMOTE")) ? REMOTE : LOCAL;
 		//System.setProperty("java.rmi.server.hostname","localhost");
 		
-		if (localOrRemote == 0) {
+		if (localOrRemote == LOCAL) {
 			System.setSecurityManager(null);
 			CrcData data  = loadData("hertz.csv");
 			CarRentalCompany crc =  new CarRentalCompany(data.name, data.regions, data.cars);

@@ -64,6 +64,4 @@ public class Car {
     public List<Reservation> getReservations(){
     	return reservations;
     }
-
-
 }
