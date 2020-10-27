@@ -35,11 +35,19 @@ public class Client extends AbstractTestManagement<AgencyReservationSession, Age
 		// indicates whether the application is run on the remote setup or not.
 		int localOrRemote = (args.length == 1 && args[0].equals("REMOTE")) ? REMOTE : LOCAL;
 		System.setSecurityManager(null);
-		String carRentalCompanyName = "Hertz";
+		String[] carRentalCompanyNames = new String[] {"Hertz", "Dockx"};
 
+		CentralNamingService centralNamingService = new CentralNamingService();
+		
+		for (String companyName : carRentalCompanyNames) 
+		{
+			Client client = new Client("trips", companyName, localOrRemote);
+			centralNamingService.addClient(companyName, client);
+			client.run();
+		}
+		
 		// An example reservation scenario on car rental company 'Hertz' would be...
-		Client client = new Client("simpleTrips", carRentalCompanyName, localOrRemote);
-		client.run();
+		
 	}
 
 	/***************
@@ -93,7 +101,7 @@ public class Client extends AbstractTestManagement<AgencyReservationSession, Age
 	@Override
 	protected void checkForAvailableCarTypes(AgencyReservationSession session, Date start, Date end) throws Exception {
 		Collection<CarType> availableCarTypes = session.getAvailableCarTypes(start, end);
-		System.out.println("Cars Available at: " + session.getCompanyName());
+		System.out.println("Available cars: ");
 		
 		for (CarType type: availableCarTypes) {			
 			System.out.println(" - " + type.getName());

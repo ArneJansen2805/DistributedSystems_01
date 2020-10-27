@@ -10,28 +10,17 @@ public class AgencyReservationSession {
 	
 	private String userName;
 	private Collection<Quote> quotes; 
-	private CarRentalCompany rentalCompany;
-	
-	
-	public String getCompanyName() {	
-		return rentalCompany.getName();
-	}
-	
-	public double getCompanyRentalPricePerDay(String carType) {
-		return rentalCompany.getCarType(carType).getRentalPricePerDay();
-	}
+	private ICarRentalCompany rentalCompany;
 	
 	public AgencyReservationSession(String userName, ICarRentalCompany rentalCompany) {
 		this.userName = userName;
 		this.quotes = new ArrayList<Quote>();
-		this.rentalCompany = (CarRentalCompany)rentalCompany;
+		this.rentalCompany = rentalCompany;
 	}
 	
 	public void addQuote(String name, Date start, Date end,
-			String carType, String region) {
-		String companyName = getCompanyName();
-		double price = getCompanyRentalPricePerDay(carType);
-		Quote quote = new Quote(name, start, end, companyName, carType, price);
+			String carType, String region) throws RemoteException, ReservationException {
+		Quote quote = rentalCompany.createQuote(new ReservationConstraints(start, end, carType, region), name);
 		this.quotes.add(quote);
 	}
 	

@@ -6,7 +6,7 @@ import java.util.*;
 
 
 public interface ICarRentalCompany extends Remote {
-
+	
 	public Collection<CarType> getAvailableCarTypes(Date from, Date end) throws RemoteException ;
 	
 	public Quote createQuote(ReservationConstraints constraints, String client) throws ReservationException, RemoteException ;
