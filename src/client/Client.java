@@ -61,7 +61,7 @@ public class Client extends AbstractTestManagement<AgencyReservationSession, Age
 		
 		try {
 			registry = LocateRegistry.getRegistry();
-			 crc = (ICarRentalCompany) registry.lookup("cars");
+			 crc = (ICarRentalCompany) registry.lookup("cars_" + carRentalCompanyName);
 		} catch (RemoteException e) {
 			
 			e.printStackTrace();
@@ -101,7 +101,7 @@ public class Client extends AbstractTestManagement<AgencyReservationSession, Age
 	@Override
 	protected void checkForAvailableCarTypes(AgencyReservationSession session, Date start, Date end) throws Exception {
 		Collection<CarType> availableCarTypes = session.getAvailableCarTypes(start, end);
-		System.out.println("Available cars: ");
+		System.out.println("Available Cars Types: ");
 		
 		for (CarType type: availableCarTypes) {			
 			System.out.println(" - " + type.getName());
