@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.invoke.MethodHandles;
 import java.rmi.Naming;
+import java.rmi.NotBoundException;
 import java.rmi.registry.*;
 import java.rmi.server.*;
 import java.util.Arrays;
@@ -13,33 +14,44 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import rental_agency.CentralNamingService;
+import rental_agency.rentalAgency;
+
 public class RentalServer {
 	
 	private final static int LOCAL = 0;
 	private final static int REMOTE = 1;
 
 	public static void main(String[] args) throws ReservationException,
-			NumberFormatException, IOException {
+			NumberFormatException, IOException, NotBoundException {
 		// The first argument passed to the `main` method (if present)
 		// indicates whether the application is run on the remote setup or not.
 		int localOrRemote = (args.length == 1 && args[0].equals("REMOTE")) ? REMOTE : LOCAL;
-		//System.setProperty("java.rmi.server.hostname","localhost");
+		
+		
 		String[] CarCompaniesDataFiles = new String[] {"hertz.csv", "dockx.csv"};
 		
 		
 		if (localOrRemote == LOCAL) {
 			System.setSecurityManager(null);
+			Registry reg = LocateRegistry.createRegistry(1099);
+			
+			CentralNamingService cns = new CentralNamingService();
+			rentalAgency agency = new rentalAgency();
+		
 			
 			for (String fileName : CarCompaniesDataFiles) {
 				CrcData data  = loadData(fileName);
 				CarRentalCompany crc =  new CarRentalCompany(data.name, data.regions, data.cars);
-				ICarRentalCompany stub = (ICarRentalCompany)
-						UnicastRemoteObject.exportObject(crc, 0);
-						Registry reg = LocateRegistry.createRegistry(1099);
-						reg.rebind("cars_" + data.name, stub);
+				cns.registerCRC(crc);
 					}
+			CentralNamingService stub = (CentralNamingService) UnicastRemoteObject.exportObject(cns, 0);
+			reg.rebind("naming" , stub);
+			
+			rentalAgency stub2 = (rentalAgency) UnicastRemoteObject.exportObject(agency, 0);
+			reg.rebind("agency" , stub2);
 				}
-			//Naming.rebind("//localhost:1099/" + "cars",stub);
+			
 					
 		
 		

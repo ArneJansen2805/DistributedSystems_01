@@ -8,13 +8,15 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import rental.AgencyManagerSession;
-import rental.AgencyReservationSession;
 import rental.CarType;
 import rental.ICarRentalCompany;
 import rental.Quote;
 import rental.Reservation;
 import rental.ReservationConstraints;
+import rental_agency.AgencyManagerSession;
+import rental_agency.AgencyReservationSession;
+import rental_agency.CentralNamingService;
+import rental_agency.rentalAgency;
 
 public class Client extends AbstractTestManagement<AgencyReservationSession, AgencyManagerSession> {
 
@@ -24,7 +26,6 @@ public class Client extends AbstractTestManagement<AgencyReservationSession, Age
 
 	private final static int LOCAL = 0;
 	private final static int REMOTE = 1;
-	private ICarRentalCompany crc;
 
 	/**
 	 * The `main` method is used to launch the client application and run the test
@@ -35,41 +36,35 @@ public class Client extends AbstractTestManagement<AgencyReservationSession, Age
 		// indicates whether the application is run on the remote setup or not.
 		int localOrRemote = (args.length == 1 && args[0].equals("REMOTE")) ? REMOTE : LOCAL;
 		System.setSecurityManager(null);
-		String[] carRentalCompanyNames = new String[] {"Hertz", "Dockx"};
+		//String[] carRentalCompanyNames = new String[] {"Hertz", "Dockx"};
 
-		CentralNamingService centralNamingService = new CentralNamingService();
+	
 		
-		for (String companyName : carRentalCompanyNames) 
-		{
-			Client client = new Client("trips", companyName, localOrRemote);
-			centralNamingService.addClient(companyName, client);
+		
+			Client client = new Client("trips", localOrRemote);
+			
 			client.run();
-		}
-		
-		// An example reservation scenario on car rental company 'Hertz' would be...
-		
 	}
+
 
 	/***************
 	 * CONSTRUCTOR 
 	 * @throws NotBoundException *
 	 ***************/
-
-	public Client(String scriptFile, String carRentalCompanyName, int localOrRemote) throws NotBoundException {
+	
+	public Client(String scriptFile, int localOrRemote) throws NotBoundException {
 		super(scriptFile);
 		Registry registry;
-		
 		try {
 			registry = LocateRegistry.getRegistry();
-			 crc = (ICarRentalCompany) registry.lookup("cars_" + carRentalCompanyName);
+			 agency = (rentalAgency) registry.lookup("agency");
 		} catch (RemoteException e) {
 			
 			e.printStackTrace();
 		}
-	
 		
 	}
-	
+
 	@Override
 	protected Set<String> getBestClients(AgencyManagerSession ms) throws Exception {
 		return ms.getBestClients();
@@ -89,8 +84,7 @@ public class Client extends AbstractTestManagement<AgencyReservationSession, Age
 
 	@Override
 	protected AgencyReservationSession getNewReservationSession(String name) throws Exception {
-		// TODO Fix potential issues with the addition of the new constructor 
-		return new AgencyReservationSession(name, crc);
+		return new AgencyReservationSession(name, id);
 	}
 
 	@Override
@@ -100,9 +94,10 @@ public class Client extends AbstractTestManagement<AgencyReservationSession, Age
 
 	@Override
 	protected void checkForAvailableCarTypes(AgencyReservationSession session, Date start, Date end) throws Exception {
-		Collection<CarType> availableCarTypes = session.getAvailableCarTypes(start, end);
-		System.out.println("Available Cars Types: ");
+		Collection<CarType> availableCarTypes = cns.getAvailableCarTypes(start, end);
 		
+		
+		System.out.println("Available Cars Types: ");
 		for (CarType type: availableCarTypes) {			
 			System.out.println(" - " + type.getName());
 		}
