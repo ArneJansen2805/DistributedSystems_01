@@ -84,6 +84,7 @@ public class RentalAgency implements ICarRentalAgency {
 		for (Quote quote : quotes) {
 			confirmQuote(quote);
 		}
+		return reservations;
 	}
 	
 	
@@ -105,8 +106,23 @@ public class RentalAgency implements ICarRentalAgency {
 		return nbOfReservations;
 	}
 
-	public String getCheapestCarType(Date start, Date end) throws RemoteException{
-		return null;
+	@Override
+	public String getCheapestCarType(Date start, Date end) throws RemoteException {
+		double min = Integer.MAX_VALUE;
+		String cheapestType = "";
+		
+		for (ICarRentalCompany company : companies) {
+			Collection<CarType> availableTypes  = company.getAvailableCarTypes(start, end);
+			for (CarType type : availableTypes) {
+				double currentPrice = type.getRentalPricePerDay();
+				if(currentPrice < min) {
+					min = currentPrice;
+					cheapestType = type.getName();
+				}
+			}
+		}
+		
+		return cheapestType;
 	}
 
 	public SessionManager session_() {
