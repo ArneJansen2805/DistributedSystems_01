@@ -2,28 +2,44 @@ package rental_agency;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
+
 
 public class SessionManager {
 	
 	private Map<String, AgencyReservationSession> clientSessionLookup = new HashMap<String, AgencyReservationSession>();
+	private rentalAgency agency;
 	
-	public AgencyReservationSession addSession(String id, String name) {
-		AgencyReservationSession session = new AgencyReservationSession(name, id);
-		clientSessionLookup.put(id, session);
+	public AgencyReservationSession create(String name, rentalAgency agency) {
+		this.agency = agency;
+		AgencyReservationSession session = new AgencyReservationSession(name, agency);
+		addSession(name, session);
 		return session;
-	}
-	
-	public synchronized String createClientUUID() {
-		return UUID.randomUUID().toString();
-	}
-	
-	
-	public String bindClient() {		
-		String clientId = createClientUUID();
-		//TODO: make new session and connect to client
 		
-		
-		return clientId;
 	}
+	
+	public AgencyManagerSession createManager(String name) {
+		return new AgencyManagerSession(name);
+	}
+	
+	private void addSession(String name, AgencyReservationSession session) {
+		 clientSessionLookup.put(name, session);
+	}
+	
+	public AgencyReservationSession get(String name) {
+		return clientSessionLookup.get(name);
+		
+	}
+	
+	private void removeSession(String name) {
+		AgencyReservationSession session = get(name);
+		session.clear();
+		clientSessionLookup.remove(name);
+		
+	}
+	
+	public rentalAgency agency() {
+		return agency;
+	}
+	
+	
 }

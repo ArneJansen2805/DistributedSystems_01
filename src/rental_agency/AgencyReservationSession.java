@@ -16,19 +16,22 @@ import rental.ReservationException;
 public class AgencyReservationSession {
 	
 	private String userName;
-	private Collection<Quote> quotes; 
-	private ICarRentalCompany rentalCompany;
+	private ArrayList<Quote> quotes; 
+	private ArrayList<Reservation> reservations;
+	private rentalAgency agency;
 	
-	public AgencyReservationSession(String userName, ICarRentalCompany rentalCompany) {
+	public AgencyReservationSession(String userName, rentalAgency agency) {
+		this.agency = agency;
 		this.userName = userName;
 		this.quotes = new ArrayList<Quote>();
-		this.rentalCompany = rentalCompany;
+		this.reservations = new ArrayList<Reservation>();
+		
 	}
 	
 	public void addQuote(String name, Date start, Date end,
-			String carType, String region) throws RemoteException, ReservationException {
-		Quote quote = rentalCompany.createQuote(new ReservationConstraints(start, end, carType, region), name);
-		this.quotes.add(quote);
+		String carType, String region) throws RemoteException, ReservationException {
+		ReservationConstraints con = new ReservationConstraints(start, end, carType, region);
+		quotes.add(agency.createQuote(con, name));
 	}
 	
 	public Collection<Quote> getCurrentQuotes() {
@@ -36,38 +39,26 @@ public class AgencyReservationSession {
 	} 
 	
 	public List<Reservation> confirmQuotes(String name) {
-		// TODO: check roll back
-		List<Reservation> reservations = new ArrayList<Reservation>();
-		if (name.equals(userName)) {			
-			Quote currentQuote = null;
-			
-			try {			
-				for (Quote quote : quotes) {	
-					currentQuote = quote;
-					reservations.add(rentalCompany.confirmQuote(quote));
-				}
-			}  catch (Exception e) {
-				System.err.println("Error confirming: " + currentQuote.toString());
-				System.err.println("Exception: " + e.getMessage());
-			}
-		}
- 		return reservations;
+		
+		reservations.addAll(agency.confirmQuotes(name, quotes));
+		return reservations;
+		
+	}	
+	
+	public Collection<CarType> checkForAvailableCarTypes(Date start, Date end) throws RemoteException{
+		return agency.getAvailableCarTypes(start, end);
+	}	
+
+	public String getCheapestCarType(Date start, Date end) throws RemoteException {
+		return agency.getCheapestCarType(start, end);
 	}
 	
-	public Collection<CarType> getAvailableCarTypes(Date start, Date end) throws RemoteException {
-		return rentalCompany.getAvailableCarTypes(start, end);
-	}
-	
-	public String getCheapestCarTypes(Date start, Date end) throws RemoteException {
-		int minPrice = Integer.MAX_VALUE;
-		CarType cheapestType = null;
-		Collection<CarType> availableTypes = getAvailableCarTypes(start, end);
-		for (CarType type : availableTypes) {
-			if (type.getRentalPricePerDay() < minPrice) {
-				cheapestType = type;
-			}
-		}
-		return cheapestType.getName();
+	public void clear() {
+		quotes = null;
+		reservations = null; 
+		userName = null; 
+		agency = null;
+		
 	}
 
 }
