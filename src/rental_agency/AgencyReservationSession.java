@@ -18,9 +18,9 @@ public class AgencyReservationSession {
 	private String userName;
 	private ArrayList<Quote> quotes; 
 	private ArrayList<Reservation> reservations;
-	private rentalAgency agency;
+	private ICarRentalAgency agency;
 	
-	public AgencyReservationSession(String userName, rentalAgency agency) {
+	public AgencyReservationSession(String userName, ICarRentalAgency agency) {
 		this.agency = agency;
 		this.userName = userName;
 		this.quotes = new ArrayList<Quote>();
@@ -38,9 +38,9 @@ public class AgencyReservationSession {
 		return quotes;
 	} 
 	
-	public List<Reservation> confirmQuotes(String name) {
+	public List<Reservation> confirmQuotes(String name) throws RemoteException, ReservationException {
 		
-		reservations.addAll(agency.confirmQuotes(name, quotes));
+		reservations.addAll(agency.confirmQuotes(quotes));
 		return reservations;
 		
 	}	

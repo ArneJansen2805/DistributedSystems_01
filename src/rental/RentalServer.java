@@ -15,7 +15,8 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import rental_agency.CentralNamingService;
-import rental_agency.rentalAgency;
+import rental_agency.RentalAgency;
+import rental_agency.ICarRentalAgency;
 
 public class RentalServer {
 	
@@ -37,7 +38,7 @@ public class RentalServer {
 			Registry reg = LocateRegistry.createRegistry(1099);
 			
 			CentralNamingService cns = new CentralNamingService();
-			rentalAgency agency = new rentalAgency();
+			ICarRentalAgency agency = new RentalAgency();
 		
 			
 			for (String fileName : CarCompaniesDataFiles) {
@@ -48,7 +49,7 @@ public class RentalServer {
 			CentralNamingService stub = (CentralNamingService) UnicastRemoteObject.exportObject(cns, 0);
 			reg.rebind("naming" , stub);
 			
-			rentalAgency stub2 = (rentalAgency) UnicastRemoteObject.exportObject(agency, 0);
+			ICarRentalAgency stub2 = (RentalAgency) UnicastRemoteObject.exportObject(agency, 0);
 			reg.rebind("agency" , stub2);
 				}
 			

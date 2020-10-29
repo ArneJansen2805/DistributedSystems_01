@@ -16,7 +16,7 @@ import rental.ReservationConstraints;
 import rental_agency.AgencyManagerSession;
 import rental_agency.AgencyReservationSession;
 import rental_agency.CentralNamingService;
-import rental_agency.rentalAgency;
+import rental_agency.ICarRentalAgency;
 
 public class Client extends AbstractTestManagement<AgencyReservationSession, AgencyManagerSession> {
 
@@ -26,7 +26,7 @@ public class Client extends AbstractTestManagement<AgencyReservationSession, Age
 
 	private final static int LOCAL = 0;
 	private final static int REMOTE = 1;
-	private static rentalAgency agency;
+	private static ICarRentalAgency agency;
 	/**
 	 * The `main` method is used to launch the client application and run the test
 	 * script.
@@ -57,7 +57,7 @@ public class Client extends AbstractTestManagement<AgencyReservationSession, Age
 		Registry registry;
 		try {
 			registry = LocateRegistry.getRegistry();
-			 agency = (rentalAgency) registry.lookup("agency");
+			 agency = (ICarRentalAgency) registry.lookup("agency");
 		} catch (RemoteException e) {
 			
 			e.printStackTrace();

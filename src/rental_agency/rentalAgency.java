@@ -19,78 +19,99 @@ import rental.Reservation;
 import rental.ReservationConstraints;
 import rental.ReservationException;
 
-public class rentalAgency implements ICarRentalCompany{
-	
-	private Map<String, String> clientIdLookup = new HashMap<String, String>();
-	
+public class RentalAgency implements ICarRentalAgency {
+
 	private static CentralNamingService cns;
 	private static List<ICarRentalCompany> companies;
 	private static SessionManager sessionManager;
 
-	public rentalAgency() throws NotBoundException {
-	
-		
+	public RentalAgency() throws NotBoundException {
 		Registry registry;
 		try {
 			registry = LocateRegistry.getRegistry();
-			 cns = (CentralNamingService) registry.lookup("naming");
-			 companies = cns.getCompanies();
+			cns = (CentralNamingService) registry.lookup("naming");
+			companies = cns.getCompanies();
 		} catch (RemoteException e) {
 			e.printStackTrace();
-		}
 		
 		sessionManager = new SessionManager();
 	}
-	
+	}
 	
 	@Override
 	public Collection<CarType> getAvailableCarTypes(Date from, Date end) throws RemoteException {
-		// TODO Auto-generated method stub
-		return null;
+		List<CarType> carTypes = new ArrayList<CarType>();
+		for (ICarRentalCompany company : companies) {
+			carTypes.addAll(company.getAvailableCarTypes(from, end));
+		}
+		return carTypes;
 	}
 
 	@Override
 	public Quote createQuote(ReservationConstraints constraints, String client)
 			throws ReservationException, RemoteException {
-		// TODO Auto-generated method stub
-		return null;
+
+		for (ICarRentalCompany company : companies) {
+			if (company.isCarAvailable(constraints)) {
+				return company.createQuote(constraints, client);
+			}
+		}
+
+		throw new ReservationException("Could not find a cars of type " + constraints.getCarType() + " available from "
+				+ constraints.getStartDate() + " to " + constraints.getEndDate() + " in the region "
+				+ constraints.getRegion() + ".");
+
 	}
+	
 
 	@Override
-	public Reservation confirmQuote(Quote quote) throws ReservationException, RemoteException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	public Reservation confirmQuote(Quote quote)
+			throws ReservationException, RemoteException, IllegalArgumentException {
 
+		for (ICarRentalCompany company : companies) {
+			if (company.getName().equals(quote.getRentalCompany()))
+				return company.confirmQuote(quote);
+		}
+
+		throw new ReservationException("Company with name: " + quote.getRentalCompany() + "is not registered and the reservation cannot be created.");
+
+	}
+	
+	
+	@Override
+	public Collection<Reservation> confirmQuotes(Collection<Quote> quotes) throws ReservationException, RemoteException {
+		Collection<Reservation> reservations = new ArrayList<Reservation>();
+		for (Quote quote : quotes) {
+			confirmQuote(quote);
+		}
+	}
+	
 	
 	@Override
 	public List<Reservation> getReservationsByRenter(String clientName) throws RemoteException {
-		// TODO Auto-generated method stub
-		return null;
+		List<Reservation> reservations = new ArrayList<Reservation>();
+		for (ICarRentalCompany company : companies) {
+			reservations.addAll(company.getReservationsByRenter(clientName));
+		}
+		return reservations;
 	}
 
 	@Override
 	public int getNumberOfReservationsForCarType(String carType) throws RemoteException {
-		// TODO Auto-generated method stub
-		return 0;
+		int nbOfReservations = 0;
+		for (ICarRentalCompany company : companies) {
+			nbOfReservations += company.getNumberOfReservationsForCarType(carType);
+		}
+		return nbOfReservations;
 	}
-
 
 	public String getCheapestCarType(Date start, Date end) throws RemoteException{
 		return null;
 	}
 
-	
-	@Override
-	public String getName() {
-
-		return "agency";
-	}
-
 	public SessionManager session_() {
 		return sessionManager;
 	}
-
 
 	public Collection<? extends Reservation> confirmQuotes(String name, List<Quote> quotes) {
 		ArrayList<Reservation> confirmed = new ArrayList<>();
@@ -109,7 +130,4 @@ public class rentalAgency implements ICarRentalCompany{
 		return confirmed;
 	}
 
-
-
-	
 }

@@ -7,9 +7,9 @@ import java.util.Map;
 public class SessionManager {
 	
 	private Map<String, AgencyReservationSession> clientSessionLookup = new HashMap<String, AgencyReservationSession>();
-	private rentalAgency agency;
+	private ICarRentalAgency agency;
 	
-	public AgencyReservationSession create(String name, rentalAgency agency) {
+	public AgencyReservationSession create(String name, ICarRentalAgency agency) {
 		this.agency = agency;
 		AgencyReservationSession session = new AgencyReservationSession(name, agency);
 		addSession(name, session);
@@ -37,7 +37,7 @@ public class SessionManager {
 		
 	}
 	
-	public rentalAgency agency() {
+	public ICarRentalAgency agency() {
 		return agency;
 	}
 	

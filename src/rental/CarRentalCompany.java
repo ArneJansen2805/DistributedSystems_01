@@ -120,6 +120,11 @@ public class CarRentalCompany implements ICarRentalCompany {
 		}
 		return availableCars;
 	}
+	
+	public boolean isCarAvailable(ReservationConstraints constraints) throws RemoteException {
+		return isAvailable(constraints.getCarType(), constraints.getStartDate(), constraints.getEndDate()) &&
+		operatesInRegion(constraints.getRegion());
+	}
 
 	/****************
 	 * RESERVATIONS *
