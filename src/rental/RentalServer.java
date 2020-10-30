@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.invoke.MethodHandles;
-import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.registry.*;
 import java.rmi.server.*;
@@ -41,16 +40,17 @@ public class RentalServer {
 			ICentralNamingService stub = (ICentralNamingService) UnicastRemoteObject.exportObject(cns, 0);
 			reg.rebind("naming", stub);
 			
-			ICarRentalAgency agency = new RentalAgency();
-
-			ICarRentalAgency stub2 = (ICarRentalAgency) UnicastRemoteObject.exportObject(agency, 0);
-			reg.rebind("agency", stub2);
-			
 			for (String fileName : CarCompaniesDataFiles) {
 				CrcData data = loadData(fileName);
 				CarRentalCompany crc = new CarRentalCompany(data.name, data.regions, data.cars);
-				cns.registerCRC(crc);
+				reg = LocateRegistry.getRegistry();
+				ICentralNamingService cns1 = (ICentralNamingService) reg.lookup("naming");
+				cns1.registerCRC(crc);
 			}
+			
+			ICarRentalAgency agency = new RentalAgency();
+			ICarRentalAgency stub2 = (ICarRentalAgency) UnicastRemoteObject.exportObject(agency, 0);
+			reg.rebind("agency", stub2);
 		}
 
 	}

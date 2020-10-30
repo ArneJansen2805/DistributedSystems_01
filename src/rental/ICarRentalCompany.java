@@ -1,11 +1,12 @@
 package rental;
 
+import java.io.Serializable;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.*;
 
 
-public interface ICarRentalCompany extends Remote {
+public interface ICarRentalCompany extends Serializable {
 	
 	public Collection<CarType> getAvailableCarTypes(Date from, Date end) throws RemoteException ;
 	

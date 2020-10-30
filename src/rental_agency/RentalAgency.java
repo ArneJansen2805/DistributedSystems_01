@@ -1,5 +1,9 @@
 package rental_agency;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -31,10 +35,11 @@ public class RentalAgency implements ICarRentalAgency {
 			registry = LocateRegistry.getRegistry();
 			cns =  (ICentralNamingService) registry.lookup("naming");
 			companies = cns.getCompanies();
+			sessionManager = new SessionManager();
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		
-		sessionManager = new SessionManager();
+		
 	}
 	}
 	
@@ -49,18 +54,22 @@ public class RentalAgency implements ICarRentalAgency {
 
 	@Override
 	public Quote createQuote(ReservationConstraints constraints, String client)
-			throws ReservationException, RemoteException {
-
+			throws ReservationException, RemoteException {		
+	
+		
 		for (ICarRentalCompany company : companies) {
+			
 			if (company.isCarAvailable(constraints)) {
 				return company.createQuote(constraints, client);
 			}
 		}
-
+		
+		throw new ReservationException("length of companies is:" + companies.size());
+/**
 		throw new ReservationException("Could not find a cars of type " + constraints.getCarType() + " available from "
 				+ constraints.getStartDate() + " to " + constraints.getEndDate() + " in the region "
 				+ constraints.getRegion() + ".");
-
+**/
 	}
 	
 

@@ -1,10 +1,16 @@
 package rental_agency;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 
-public class SessionManager {
+public class SessionManager implements Serializable {
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4264379014286412482L;
 	
 	private Map<String, AgencyReservationSession> clientSessionLookup = new HashMap<String, AgencyReservationSession>();
 	private ICarRentalAgency agency;
