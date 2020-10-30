@@ -11,14 +11,21 @@ import java.util.Set;
 
 import rental.CarRentalCompany;
 import rental.CarType;
+import rental.ICarRentalCompany;
 
 public class AgencyManagerSession {
-	String agencyManagerName = "";
-	Map<String, CarRentalCompany> carRentalCompanies;
+	String agencyManagerName = "manager";
+	HashMap<String, ICarRentalCompany> carRentalCompanies;
+	private ICarRentalAgency agency;
 
-	public AgencyManagerSession(String name) {
+	public AgencyManagerSession(String name, ICarRentalAgency agency) throws RemoteException {
 		agencyManagerName = name;
-		carRentalCompanies = new HashMap<String, CarRentalCompany>();
+		this.agency = agency;
+		carRentalCompanies = new HashMap<String, ICarRentalCompany>();
+		for (ICarRentalCompany c : agency.getCompanies()) {
+			carRentalCompanies.put(c.getName(), c);
+		}
+	
 	}
 
 	public void Register(CarRentalCompany rentalCompany) {
@@ -29,18 +36,18 @@ public class AgencyManagerSession {
 		carRentalCompanies.remove(rentalCompanyName);
 	}
 
-	public Collection<CarRentalCompany> getRegisteredCompanies() {
+	public Collection<ICarRentalCompany> getRegisteredCompanies() {
 		return carRentalCompanies.values();
 	}
 
 	public Collection<CarType> getRegisteredCompanyCarTypes(String companyName) {
-		CarRentalCompany company = getCarRentalCompany(companyName);
+		ICarRentalCompany company = getCarRentalCompany(companyName);
 		return company.getAllCarTypes();
 	}
 
 	public int getNumberOfCompanyReservationsPerCarType(String companyName, String carType) throws Exception {
 		try {
-			CarRentalCompany company = getCarRentalCompany(companyName);
+			ICarRentalCompany company = getCarRentalCompany(companyName);
 			return company.getNumberOfReservationsForCarType(carType);
 		} catch (Exception e) {
 			throw new Exception("Error retrieving number of company reservations for company: " + companyName
@@ -50,7 +57,7 @@ public class AgencyManagerSession {
 	
 	public int getNumberOfReservationsByRenter(String clientName) {
 		int numberOfReservations = 0;
-		for (CarRentalCompany crc : carRentalCompanies.values()) {
+		for (ICarRentalCompany crc : carRentalCompanies.values()) {
 			try {
 				numberOfReservations += crc.getReservationsByRenter(clientName).size();
 			} catch (RemoteException e) {
@@ -63,7 +70,7 @@ public class AgencyManagerSession {
 	public Set<String> getBestClients() {
 		List<String> bestCustomers = new ArrayList<String>();
 		
-		for (CarRentalCompany company : carRentalCompanies.values()) {
+		for (ICarRentalCompany company : carRentalCompanies.values()) {
 			List<String> companyBest =  company.getBestCustomers();
 			bestCustomers.addAll(companyBest);			
 		}
@@ -75,16 +82,16 @@ public class AgencyManagerSession {
 	
 	
 	public CarType getMostPopularCarType(String companyName, int year) {
-		CarRentalCompany company = getCarRentalCompany(companyName);
+		ICarRentalCompany company = getCarRentalCompany(companyName);
 		return company.getMostPopularCarTypePerYear(year);
 	}
 	
 
-	private CarRentalCompany getCarRentalCompany(String companyName) throws IllegalArgumentException {
+	private ICarRentalCompany getCarRentalCompany(String companyName) throws IllegalArgumentException {
 		if (!carRentalCompanies.containsKey(companyName))
 			throw new IllegalArgumentException("No registered company named: " + companyName + "found.");
 
-		CarRentalCompany company = carRentalCompanies.get(companyName);
+		ICarRentalCompany company = carRentalCompanies.get(companyName);
 		return company;
 	}
 }

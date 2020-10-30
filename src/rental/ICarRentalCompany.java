@@ -21,4 +21,10 @@ public interface ICarRentalCompany extends Serializable {
 	public boolean isCarAvailable(ReservationConstraints constraints) throws RemoteException;
 
 	public String getName();
+	
+	public List<String> getBestCustomers();
+	
+	public CarType getMostPopularCarTypePerYear(int year) ;
+	
+	public Collection<CarType> getAllCarTypes();
 }

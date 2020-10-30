@@ -1,6 +1,7 @@
 package rental_agency;
 
 import java.io.Serializable;
+import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,8 +24,12 @@ public class SessionManager implements Serializable {
 		
 	}
 	
-	public AgencyManagerSession createManager(String name) {
-		return new AgencyManagerSession(name);
+	public AgencyManagerSession createManager(String name) throws RemoteException {
+		
+		
+		return new AgencyManagerSession(name, agency);
+		
+		
 	}
 	
 	private void addSession(String name, AgencyReservationSession session) {

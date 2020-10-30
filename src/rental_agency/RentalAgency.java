@@ -1,9 +1,6 @@
 package rental_agency;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
+
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -11,9 +8,8 @@ import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
+
 import java.util.List;
-import java.util.Map;
 
 import rental.CarRentalCompany;
 import rental.CarType;
@@ -27,7 +23,7 @@ public class RentalAgency implements ICarRentalAgency {
 
 	private static ICentralNamingService cns;
 	private static List<ICarRentalCompany> companies;
-	private static SessionManager sessionManager;
+	private SessionManager sessionManager;
 
 	public RentalAgency() throws NotBoundException {
 		Registry registry;
@@ -40,7 +36,7 @@ public class RentalAgency implements ICarRentalAgency {
 			e.printStackTrace();
 		
 		
-	}
+		}	
 	}
 	
 	@Override
@@ -156,6 +152,35 @@ public class RentalAgency implements ICarRentalAgency {
 		}
 		
 		return confirmed;
+	}
+
+
+	@Override
+	public ArrayList<ICarRentalCompany> getCompanies() {
+		return (ArrayList<ICarRentalCompany>) companies;
+	}
+
+	@Override
+	public ArrayList<CarType> getCarTypes() {
+		ArrayList<CarType> l = new ArrayList();
+		for (ICarRentalCompany c : companies) {
+			l.addAll(c.getAllCarTypes());
+		}
+		
+	
+		return l;
+	}
+
+	@Override
+	public void registerCompany(ICarRentalCompany c) throws RemoteException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void unregisterCompany(ICarRentalCompany c) throws RemoteException {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
