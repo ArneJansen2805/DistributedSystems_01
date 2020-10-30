@@ -59,22 +59,25 @@ public class RentalAgency implements ICarRentalAgency {
 		
 		for (ICarRentalCompany company : companies) {
 			
-			if (company.isCarAvailable(constraints)) {
-				return company.createQuote(constraints, client);
-			}
+			try {
+				if (company.isCarAvailable(constraints)) {
+					return company.createQuote(constraints, client);
+				}
+			} catch (IllegalArgumentException e) {
+				System.out.println("Company does not have this car, moving on...");
+			} 
 		}
 		
-		throw new ReservationException("length of companies is:" + companies.size());
-/**
-		throw new ReservationException("Could not find a cars of type " + constraints.getCarType() + " available from "
+		
+	throw new ReservationException("Could not find a cars of type " + constraints.getCarType() + " available from "
 				+ constraints.getStartDate() + " to " + constraints.getEndDate() + " in the region "
 				+ constraints.getRegion() + ".");
-**/
+
 	}
 	
 
 	@Override
-	public Reservation confirmQuote(Quote quote)
+	public synchronized Reservation confirmQuote(Quote quote)
 			throws ReservationException, RemoteException, IllegalArgumentException {
 
 		for (ICarRentalCompany company : companies) {
