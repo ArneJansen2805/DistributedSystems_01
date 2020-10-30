@@ -156,8 +156,8 @@ public class RentalAgency implements ICarRentalAgency {
 
 
 	@Override
-	public ArrayList<ICarRentalCompany> getCompanies() {
-		return (ArrayList<ICarRentalCompany>) companies;
+	public List<ICarRentalCompany> getCompanies() {
+		return companies;
 	}
 
 	@Override

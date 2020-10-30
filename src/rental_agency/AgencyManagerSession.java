@@ -18,16 +18,22 @@ public class AgencyManagerSession {
 	HashMap<String, ICarRentalCompany> carRentalCompanies;
 	private ICarRentalAgency agency;
 
-	public AgencyManagerSession(String name, ICarRentalAgency agency) throws RemoteException {
+	public AgencyManagerSession(String name, ICarRentalAgency agency) throws Exception {
 		agencyManagerName = name;
 		this.agency = agency;
 		carRentalCompanies = new HashMap<String, ICarRentalCompany>();
-		for (ICarRentalCompany c : agency.getCompanies()) {
-			carRentalCompanies.put(c.getName(), c);
-		}
+		localizeCompanies();
 	
 	}
 
+	private void localizeCompanies() throws Exception{
+		
+
+		for (ICarRentalCompany c : agency.getCompanies()) {
+			carRentalCompanies.put(c.getName(), c);
+	
+		}
+	}
 	public void Register(CarRentalCompany rentalCompany) {
 		carRentalCompanies.put(rentalCompany.getName(), rentalCompany);
 	}

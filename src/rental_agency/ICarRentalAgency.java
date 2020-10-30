@@ -36,7 +36,7 @@ public interface ICarRentalAgency extends Remote {
 	
 	public void registerCompany(ICarRentalCompany c) throws RemoteException;
 	public void unregisterCompany(ICarRentalCompany c)throws RemoteException;
-	public ArrayList<ICarRentalCompany> getCompanies()throws RemoteException;
+	public List<ICarRentalCompany> getCompanies()throws RemoteException;
 	public ArrayList<CarType> getCarTypes()throws RemoteException;
 
 }

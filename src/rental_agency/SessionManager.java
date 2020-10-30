@@ -24,12 +24,8 @@ public class SessionManager implements Serializable {
 		
 	}
 	
-	public AgencyManagerSession createManager(String name) throws RemoteException {
-		
-		
-		return new AgencyManagerSession(name, agency);
-		
-		
+	public AgencyManagerSession createManager(String name) throws Exception {
+		return new AgencyManagerSession(name, this.agency);
 	}
 	
 	private void addSession(String name, AgencyReservationSession session) {
