@@ -97,14 +97,14 @@ public class AgencyManagerSession {
 		for (Entry<String, Integer> val : totals.entrySet()) {
 			if(max == null || val.getValue().compareTo(max.getValue()) >0 ) {
 				max = val;
-			}
-			if (val.getValue().compareTo(max.getValue()) == 0) {
-				bestCustomers.add(val.getKey());
-			}
-		
-			
+			}	
 		}
-		bestCustomers.add(max.getKey());
+		
+		for(Entry<String, Integer> entry : totals.entrySet()) {
+			if(entry.getValue() == max.getValue()) {
+				bestCustomers.add(entry.getKey());
+			}
+		}
 		
 		// To ensure only unique best customers are returned
 		return new HashSet<String>(bestCustomers);
