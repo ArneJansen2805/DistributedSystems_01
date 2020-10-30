@@ -173,13 +173,13 @@ public class RentalAgency implements ICarRentalAgency {
 
 	@Override
 	public void registerCompany(ICarRentalCompany c) throws RemoteException {
-		// TODO Auto-generated method stub
+		companies.add(c);
 		
 	}
 
 	@Override
 	public void unregisterCompany(ICarRentalCompany c) throws RemoteException {
-		// TODO Auto-generated method stub
+		companies.remove(c);
 		
 	}
 

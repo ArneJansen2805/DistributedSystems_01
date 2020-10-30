@@ -85,7 +85,7 @@ public class Client extends AbstractTestManagement<AgencyReservationSession, Age
 
 	@Override
 	protected AgencyManagerSession getNewManagerSession(String name) throws Exception {
-		return agency.session_().createManager(name);
+		return agency.session_().createManager(name, agency);
 	}
 
 	@Override

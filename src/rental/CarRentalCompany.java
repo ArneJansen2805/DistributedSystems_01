@@ -213,11 +213,11 @@ public class CarRentalCompany implements ICarRentalCompany {
 	}
 
 	// Get customers with highest number of reservations
-	public List<String> getBestCustomers() {
+	public Map<String, Integer> getBestCustomers() {
 		List<String> bestRenters = new ArrayList<String>();
 		Map<String, Integer> carRentalsMap = getCarRentalsReservationNumbersMap();
-		int max = getMaxReservationsRented(carRentalsMap);
-
+		return carRentalsMap;
+/**
 		for (String renter : carRentalsMap.keySet()) {
 			if (carRentalsMap.get(renter) == max) {
 				bestRenters.add(renter);
@@ -225,6 +225,7 @@ public class CarRentalCompany implements ICarRentalCompany {
 		}
 		
 		return bestRenters;
+		**/
 	}
 	
 	public int getNumberOfReservationsForRenter(String renter) 

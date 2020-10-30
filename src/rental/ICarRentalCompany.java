@@ -22,7 +22,7 @@ public interface ICarRentalCompany extends Serializable {
 
 	public String getName();
 	
-	public List<String> getBestCustomers();
+	public Map<String, Integer> getBestCustomers();
 	
 	public CarType getMostPopularCarTypePerYear(int year) ;
 	

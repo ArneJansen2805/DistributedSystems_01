@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import rental.CarRentalCompany;
@@ -34,12 +35,15 @@ public class AgencyManagerSession {
 	
 		}
 	}
-	public void Register(CarRentalCompany rentalCompany) {
+	public void Register(CarRentalCompany rentalCompany) throws RemoteException {
 		carRentalCompanies.put(rentalCompany.getName(), rentalCompany);
+		agency.registerCompany(rentalCompany);
 	}
 
-	public void UnRegister(String rentalCompanyName) {
-		carRentalCompanies.remove(rentalCompanyName);
+	public void UnRegister(String rentalCompanyName) throws RemoteException {
+		ICarRentalCompany c = carRentalCompanies.get(rentalCompanyName);
+		carRentalCompanies.remove(c);
+		agency.unregisterCompany(c);
 	}
 
 	public Collection<ICarRentalCompany> getRegisteredCompanies() {
@@ -75,11 +79,32 @@ public class AgencyManagerSession {
 
 	public Set<String> getBestClients() {
 		List<String> bestCustomers = new ArrayList<String>();
+		HashMap<String, Integer> totals = new HashMap<String, Integer>();
 		
 		for (ICarRentalCompany company : carRentalCompanies.values()) {
-			List<String> companyBest =  company.getBestCustomers();
-			bestCustomers.addAll(companyBest);			
+			HashMap<String, Integer>companyBest =  (HashMap<String, Integer>) company.getBestCustomers();
+			for(String name : companyBest.keySet())		{
+				if (totals.containsKey(name)) {
+					totals.put(name, totals.get(name) + companyBest.get(name));
+				}
+				else {
+					totals.put(name, companyBest.get(name));
+				}
+			}
 		}
+		
+		Entry<String, Integer> max = null;
+		for (Entry<String, Integer> val : totals.entrySet()) {
+			if(max == null || val.getValue().compareTo(max.getValue()) >0 ) {
+				max = val;
+			}
+			if (val.getValue().compareTo(max.getValue()) == 0) {
+				bestCustomers.add(val.getKey());
+			}
+		
+			
+		}
+		bestCustomers.add(max.getKey());
 		
 		// To ensure only unique best customers are returned
 		return new HashSet<String>(bestCustomers);

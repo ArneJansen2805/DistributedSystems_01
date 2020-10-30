@@ -24,8 +24,9 @@ public class SessionManager implements Serializable {
 		
 	}
 	
-	public AgencyManagerSession createManager(String name) throws Exception {
-		return new AgencyManagerSession(name, this.agency);
+	public AgencyManagerSession createManager(String name, ICarRentalAgency agency) throws Exception {
+		this.agency = agency;
+		return new AgencyManagerSession(name, agency);
 	}
 	
 	private void addSession(String name, AgencyReservationSession session) {
