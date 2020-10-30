@@ -2,7 +2,10 @@ package rental_agency;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -112,9 +115,43 @@ public class AgencyManagerSession {
 	}
 	
 	
-	public CarType getMostPopularCarType(String companyName, int year) {
-		ICarRentalCompany company = getCarRentalCompany(companyName);
-		return company.getMostPopularCarTypePerYear(year);
+	public CarType getMostPopularCarType(String companyName, int year) throws IllegalArgumentException, RemoteException {
+		CarType bestCarType = null;
+		
+		ICarRentalCompany company = null;
+		
+		for (ICarRentalCompany c : carRentalCompanies.values()) {
+			if (c.getName().equals(companyName)) {
+				company = c;
+				break;
+			}
+		}
+		
+		if (company == null) 
+			throw new IllegalArgumentException("Could not find company: " + companyName);
+		
+		// Used calendar to avoid using deprecated Date constructors
+		Calendar calendar = new GregorianCalendar();
+		
+		calendar.set(year, 0, 1);
+		Date start = Date.from(calendar.toInstant());
+		
+		calendar.set(year, 11, 31);
+		Date end = Date.from(calendar.toInstant());
+		
+		Collection<CarType> availableCarTypes = company.getAvailableCarTypes(start, end);
+		
+		int max = Integer.MIN_VALUE;
+		
+		for (CarType type : availableCarTypes) {
+			int resPerType = company.getNumberOfReservationsForCarTypePerTimePeriod(type.getName(), start, end);
+			if (resPerType > max) {
+				max = resPerType;
+				bestCarType = type;
+			}
+		}
+		
+		return bestCarType;
 	}
 	
 

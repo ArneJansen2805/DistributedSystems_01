@@ -1,6 +1,5 @@
 package rental_agency;
 
-
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -29,16 +28,15 @@ public class RentalAgency implements ICarRentalAgency {
 		Registry registry;
 		try {
 			registry = LocateRegistry.getRegistry();
-			cns =  (ICentralNamingService) registry.lookup("naming");
+			cns = (ICentralNamingService) registry.lookup("naming");
 			companies = cns.getCompanies();
 			sessionManager = new SessionManager();
 		} catch (RemoteException e) {
 			e.printStackTrace();
-		
-		
-		}	
+
+		}
 	}
-	
+
 	@Override
 	public Collection<CarType> getAvailableCarTypes(Date from, Date end) throws RemoteException {
 		List<CarType> carTypes = new ArrayList<CarType>();
@@ -50,27 +48,24 @@ public class RentalAgency implements ICarRentalAgency {
 
 	@Override
 	public Quote createQuote(ReservationConstraints constraints, String client)
-			throws ReservationException, RemoteException {		
-	
-		
+			throws ReservationException, RemoteException {
+
 		for (ICarRentalCompany company : companies) {
-			
+
 			try {
 				if (company.isCarAvailable(constraints)) {
 					return company.createQuote(constraints, client);
 				}
 			} catch (IllegalArgumentException e) {
 				System.out.println("Company does not have this car, moving on...");
-			} 
+			}
 		}
-		
-		
-	throw new ReservationException("Could not find a cars of type " + constraints.getCarType() + " available from "
+
+		throw new ReservationException("Could not find a cars of type " + constraints.getCarType() + " available from "
 				+ constraints.getStartDate() + " to " + constraints.getEndDate() + " in the region "
 				+ constraints.getRegion() + ".");
 
 	}
-	
 
 	@Override
 	public synchronized Reservation confirmQuote(Quote quote)
@@ -81,21 +76,21 @@ public class RentalAgency implements ICarRentalAgency {
 				return company.confirmQuote(quote);
 		}
 
-		throw new ReservationException("Company with name: " + quote.getRentalCompany() + "is not registered and the reservation cannot be created.");
+		throw new ReservationException("Company with name: " + quote.getRentalCompany()
+				+ "is not registered and the reservation cannot be created.");
 
 	}
-	
-	
+
 	@Override
-	public Collection<Reservation> confirmQuotes(Collection<Quote> quotes) throws ReservationException, RemoteException {
+	public Collection<Reservation> confirmQuotes(Collection<Quote> quotes)
+			throws ReservationException, RemoteException {
 		Collection<Reservation> reservations = new ArrayList<Reservation>();
 		for (Quote quote : quotes) {
 			confirmQuote(quote);
 		}
 		return reservations;
 	}
-	
-	
+
 	@Override
 	public List<Reservation> getReservationsByRenter(String clientName) throws RemoteException {
 		List<Reservation> reservations = new ArrayList<Reservation>();
@@ -118,18 +113,18 @@ public class RentalAgency implements ICarRentalAgency {
 	public String getCheapestCarType(Date start, Date end) throws RemoteException {
 		double min = Integer.MAX_VALUE;
 		String cheapestType = "";
-		
+
 		for (ICarRentalCompany company : companies) {
-			Collection<CarType> availableTypes  = company.getAvailableCarTypes(start, end);
+			Collection<CarType> availableTypes = company.getAvailableCarTypes(start, end);
 			for (CarType type : availableTypes) {
 				double currentPrice = type.getRentalPricePerDay();
-				if(currentPrice < min) {
+				if (currentPrice < min) {
 					min = currentPrice;
 					cheapestType = type.getName();
 				}
 			}
 		}
-		
+
 		return cheapestType;
 	}
 
@@ -143,17 +138,15 @@ public class RentalAgency implements ICarRentalAgency {
 			for (Quote q : quotes) {
 				confirmed.add(confirmQuote(q));
 			}
-		}
-		catch (Exception e ) {
+		} catch (Exception e) {
 			for (Reservation r : confirmed) {
 				CarRentalCompany c = (CarRentalCompany) cns.getCompany(r.getRentalCompany());
 				c.cancelReservation(r);
 			}
 		}
-		
+
 		return confirmed;
 	}
-
 
 	@Override
 	public List<ICarRentalCompany> getCompanies() {
@@ -166,21 +159,20 @@ public class RentalAgency implements ICarRentalAgency {
 		for (ICarRentalCompany c : companies) {
 			l.addAll(c.getAllCarTypes());
 		}
-		
-	
+
 		return l;
 	}
 
 	@Override
 	public void registerCompany(ICarRentalCompany c) throws RemoteException {
 		companies.add(c);
-		
+
 	}
 
 	@Override
 	public void unregisterCompany(ICarRentalCompany c) throws RemoteException {
 		companies.remove(c);
-		
+
 	}
 
 }

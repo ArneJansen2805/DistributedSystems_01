@@ -49,5 +49,4 @@ public class SessionManager implements Serializable {
 		return agency;
 	}
 	
-	
 }

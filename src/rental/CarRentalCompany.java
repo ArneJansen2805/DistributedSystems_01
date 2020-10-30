@@ -211,6 +211,23 @@ public class CarRentalCompany implements ICarRentalCompany {
 		}
 		return count;
 	}
+	
+	public int getNumberOfReservationsForCarTypePerTimePeriod(String carType, Date start, Date end) throws RemoteException {
+		int count = 0;
+		for (Car c : cars) {
+			if (c.getType().getName().equals(carType)) {
+				for (Reservation res : c.getReservations()) {
+					if (res.getStartDate().equals(start) ||
+						res.getEndDate().equals(end) ||
+						(res.getStartDate().after(start)
+								&& res.getEndDate().before(end))) {
+						count+=1;
+					}
+				}
+			}
+		}
+		return count;
+	}
 
 	// Get customers with highest number of reservations
 	public Map<String, Integer> getBestCustomers() {
@@ -268,7 +285,13 @@ public class CarRentalCompany implements ICarRentalCompany {
 				}
 				
 				int currentNumber = carTypesRented.get(currentType);
-				int newTotal = currentNumber + car.getReservations().size();
+				int newTotal = currentNumber;
+				for (Reservation r : car.getReservations()) {
+					if (r.getStartDate().after(start) && r.getEndDate().before(end) 
+							|| (r.getStartDate().equals(start)) || r.getEndDate().equals(end)) {
+						newTotal += 1;
+					}
+				} 				
 				carTypesRented.replace(currentType, newTotal);
 				
 				if (newTotal > maxRented) {

@@ -17,6 +17,8 @@ public interface ICarRentalCompany extends Serializable {
 	public List<Reservation> getReservationsByRenter(String clientName)throws RemoteException;
 	
 	public int getNumberOfReservationsForCarType(String carType) throws RemoteException;
+
+	public int getNumberOfReservationsForCarTypePerTimePeriod(String carType, Date start, Date end) throws RemoteException;
 	
 	public boolean isCarAvailable(ReservationConstraints constraints) throws RemoteException;
 
