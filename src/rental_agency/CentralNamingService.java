@@ -1,24 +1,28 @@
 package rental_agency;
 
 import java.rmi.Remote;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 
 import rental.ICarRentalCompany;
 
-public class CentralNamingService implements Remote {
+public class CentralNamingService implements ICentralNamingService {
 	
 	private ArrayList<ICarRentalCompany> companies = new ArrayList<>();
 	
-	public void registerCRC(ICarRentalCompany crc) {
+	@Override
+	public void registerCRC(ICarRentalCompany crc) throws RemoteException {
 		companies.add(crc);
 	}
 	
-	@SuppressWarnings("rawtypes")
-	public ArrayList getCompanies() {
-		return  (ArrayList) companies.clone();
+	@SuppressWarnings("unchecked")
+	@Override
+	public ArrayList<ICarRentalCompany> getCompanies() throws RemoteException {
+		return  (ArrayList<ICarRentalCompany>) companies.clone();
 	}
 	
-	public ICarRentalCompany getCompany(String name) {
+	@Override
+	public ICarRentalCompany getCompany(String name) throws RemoteException {
 
 		for (ICarRentalCompany c : companies) {
 			if (c.getName() == name) {

@@ -14,7 +14,7 @@ import rental.ReservationException;
 
 public interface ICarRentalAgency extends Remote {
 	
-	public Collection<CarType> getAvailableCarTypes(Date from, Date end) throws RemoteException ;
+	public Collection<CarType> getAvailableCarTypes(Date from, Date end) throws RemoteException;
 	
 	public Quote createQuote(ReservationConstraints constraints, String client) throws ReservationException, RemoteException ;
 	

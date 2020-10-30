@@ -17,49 +17,45 @@ import java.util.StringTokenizer;
 import rental_agency.CentralNamingService;
 import rental_agency.RentalAgency;
 import rental_agency.ICarRentalAgency;
+import rental_agency.ICentralNamingService;
 
 public class RentalServer {
-	
+
 	private final static int LOCAL = 0;
 	private final static int REMOTE = 1;
 
-	public static void main(String[] args) throws ReservationException,
-			NumberFormatException, IOException, NotBoundException {
+	public static void main(String[] args)
+			throws ReservationException, NumberFormatException, IOException, NotBoundException {
 		// The first argument passed to the `main` method (if present)
 		// indicates whether the application is run on the remote setup or not.
 		int localOrRemote = (args.length == 1 && args[0].equals("REMOTE")) ? REMOTE : LOCAL;
-		
-		
-		String[] CarCompaniesDataFiles = new String[] {"hertz.csv", "dockx.csv"};
-		
+
+		String[] CarCompaniesDataFiles = new String[] { "hertz.csv", "dockx.csv" };
 		
 		if (localOrRemote == LOCAL) {
 			System.setSecurityManager(null);
 			Registry reg = LocateRegistry.createRegistry(1099);
-			
+
 			CentralNamingService cns = new CentralNamingService();
+			
+			ICentralNamingService stub = (ICentralNamingService) UnicastRemoteObject.exportObject(cns, 0);
+			reg.rebind("naming", stub);
+			
 			ICarRentalAgency agency = new RentalAgency();
-		
+
+			ICarRentalAgency stub2 = (ICarRentalAgency) UnicastRemoteObject.exportObject(agency, 0);
+			reg.rebind("agency", stub2);
 			
 			for (String fileName : CarCompaniesDataFiles) {
-				CrcData data  = loadData(fileName);
-				CarRentalCompany crc =  new CarRentalCompany(data.name, data.regions, data.cars);
+				CrcData data = loadData(fileName);
+				CarRentalCompany crc = new CarRentalCompany(data.name, data.regions, data.cars);
 				cns.registerCRC(crc);
-					}
-			CentralNamingService stub = (CentralNamingService) UnicastRemoteObject.exportObject(cns, 0);
-			reg.rebind("naming" , stub);
-			
-			ICarRentalAgency stub2 = (RentalAgency) UnicastRemoteObject.exportObject(agency, 0);
-			reg.rebind("agency" , stub2);
-				}
-			
-					
-		
-		
+			}
+		}
+
 	}
 
-	public static CrcData loadData(String datafile)
-			throws ReservationException, NumberFormatException, IOException {
+	public static CrcData loadData(String datafile) throws ReservationException, NumberFormatException, IOException {
 
 		CrcData out = new CrcData();
 		int nextuid = 0;
@@ -71,14 +67,14 @@ public class RentalServer {
 		}
 		BufferedReader in = new BufferedReader(new InputStreamReader(stream));
 		StringTokenizer csvReader;
-		
+
 		try {
 			// while next line exists
 			while (in.ready()) {
 				String line = in.readLine();
-				
+
 				if (line.startsWith("#")) {
-					// comment -> skip					
+					// comment -> skip
 				} else if (line.startsWith("-")) {
 					csvReader = new StringTokenizer(line.substring(1), ",");
 					out.name = csvReader.nextToken();
@@ -87,10 +83,8 @@ public class RentalServer {
 					// tokenize on ,
 					csvReader = new StringTokenizer(line, ",");
 					// create new car type from first 5 fields
-					CarType type = new CarType(csvReader.nextToken(),
-							Integer.parseInt(csvReader.nextToken()),
-							Float.parseFloat(csvReader.nextToken()),
-							Double.parseDouble(csvReader.nextToken()),
+					CarType type = new CarType(csvReader.nextToken(), Integer.parseInt(csvReader.nextToken()),
+							Float.parseFloat(csvReader.nextToken()), Double.parseDouble(csvReader.nextToken()),
 							Boolean.parseBoolean(csvReader.nextToken()));
 					System.out.println(type);
 					// create N new cars with given type, where N is the 5th field
@@ -105,11 +99,11 @@ public class RentalServer {
 
 		return out;
 	}
-	
+
 	static class CrcData {
 		public List<Car> cars = new LinkedList<Car>();
 		public String name;
-		public List<String> regions =  new LinkedList<String>();
+		public List<String> regions = new LinkedList<String>();
 	}
 
 }

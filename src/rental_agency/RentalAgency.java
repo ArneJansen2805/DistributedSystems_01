@@ -21,7 +21,7 @@ import rental.ReservationException;
 
 public class RentalAgency implements ICarRentalAgency {
 
-	private static CentralNamingService cns;
+	private static ICentralNamingService cns;
 	private static List<ICarRentalCompany> companies;
 	private static SessionManager sessionManager;
 
@@ -29,7 +29,7 @@ public class RentalAgency implements ICarRentalAgency {
 		Registry registry;
 		try {
 			registry = LocateRegistry.getRegistry();
-			cns = (CentralNamingService) registry.lookup("naming");
+			cns =  (ICentralNamingService) registry.lookup("naming");
 			companies = cns.getCompanies();
 		} catch (RemoteException e) {
 			e.printStackTrace();
@@ -129,7 +129,7 @@ public class RentalAgency implements ICarRentalAgency {
 		return sessionManager;
 	}
 
-	public Collection<? extends Reservation> confirmQuotes(String name, List<Quote> quotes) {
+	public Collection<? extends Reservation> confirmQuotes(String name, List<Quote> quotes) throws RemoteException {
 		ArrayList<Reservation> confirmed = new ArrayList<>();
 		try {
 			for (Quote q : quotes) {

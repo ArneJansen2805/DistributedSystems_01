@@ -37,13 +37,10 @@ public class Client extends AbstractTestManagement<AgencyReservationSession, Age
 		int localOrRemote = (args.length == 1 && args[0].equals("REMOTE")) ? REMOTE : LOCAL;
 		System.setSecurityManager(null);
 		//String[] carRentalCompanyNames = new String[] {"Hertz", "Dockx"};
-
-	
 		
+		Client client = new Client("trips", localOrRemote);
 		
-			Client client = new Client("trips", localOrRemote);
-			
-			client.run();
+		client.run();
 	}
 
 
@@ -57,9 +54,8 @@ public class Client extends AbstractTestManagement<AgencyReservationSession, Age
 		Registry registry;
 		try {
 			registry = LocateRegistry.getRegistry();
-			 agency = (ICarRentalAgency) registry.lookup("agency");
+			agency = (ICarRentalAgency) registry.lookup("agency");
 		} catch (RemoteException e) {
-			
 			e.printStackTrace();
 		}
 		
